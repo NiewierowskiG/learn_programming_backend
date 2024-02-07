@@ -15,6 +15,8 @@ class Course(models.Model):
     title = models.CharField(max_length=255, null=False)
     owner = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     language = models.ForeignKey(Language, null=True, on_delete=models.SET_NULL)
+    description = models.TextField()
+    short_desc = models.CharField(max_length=255, null=False)
 
 
 class Lesson(models.Model):
