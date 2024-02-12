@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'learn_programming',
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
@@ -50,6 +51,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
 ]
 
 ROOT_URLCONF = 'inzynierka_back.urls'
@@ -158,3 +161,8 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
+
+CORS_ALLOWED_ORIGINS = [
+    'http://*:3000',
+    'https://*:3000',
+]
