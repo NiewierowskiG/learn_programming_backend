@@ -86,7 +86,7 @@ class CourseListView(APIView):
 class CourseView(APIView):
     def get(self, request, pk):
         course = get_object_or_404(Course, pk=pk)
-        serializer = CourseSerializer(instance=course)
+        serializer = CourseSerializerSingle(instance=course)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, pk):
@@ -198,4 +198,5 @@ class OpinionView(APIView):
 class WhoAmI(APIView):
     def get(self, request):
         serializer = UserSerializer(request.user)
+        serializer.is_valid(raise_exception=True)
         return Response(serializer.data)

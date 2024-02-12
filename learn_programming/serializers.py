@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from .models import *
+from secrets import compare_digest
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -17,7 +18,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         password = attrs.get('password')
         password2 = attrs.pop('password2')
-        if password != password2:
+        if compare_digest(password, password2):
             raise serializers.ValidationError("Password and Confirm Password Does not match")
         return attrs
 
@@ -33,7 +34,6 @@ class LanguageSerializer(serializers.ModelSerializer):
 
 
 class CourseSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Course
         fields = ('id', 'title', 'owner', 'language', 'description', 'short_desc', 'url', 'avg_rating', 'count_rating')
@@ -55,3 +55,14 @@ class OpinionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Opinion
         fields = ('id', 'course', 'user', 'text', 'rating')
+
+
+class CourseSerializerSingle(serializers.ModelSerializer):
+    ratings = OpinionSerializer(many=True, read_only=True)
+    lessons = LessonSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Course
+        fields = (
+            'id', 'title', 'owner', 'language', 'description', 'short_desc', 'url', 'avg_rating', 'count_rating',
+            'ratings', 'lessons')

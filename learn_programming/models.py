@@ -28,6 +28,14 @@ class Course(models.Model):
     def count_rating(self):
         return len(Opinion.objects.filter(course_id=self.id))
 
+    @property
+    def ratings(self):
+        return Opinion.objects.filter(course_id=self.id)
+
+    @property
+    def lessons(self):
+        return Lesson.objects.filter(course_id=self.id)
+
 
 class Lesson(models.Model):
     title = models.CharField(max_length=255, null=False)
@@ -53,7 +61,9 @@ class Opinion(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.TextField()
-    rating = models.SmallIntegerField()
+    rating = models.SmallIntegerField(
+
+    )
 
     class Meta:
         unique_together = ('user', 'course')
