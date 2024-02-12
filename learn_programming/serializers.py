@@ -33,9 +33,10 @@ class LanguageSerializer(serializers.ModelSerializer):
 
 
 class CourseSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Course
-        fields = ('id', 'title', 'owner', 'language', 'description', 'short_desc')
+        fields = ('id', 'title', 'owner', 'language', 'description', 'short_desc', 'url', 'avg_rating', 'count_rating')
 
 
 class LessonSerializer(serializers.ModelSerializer):

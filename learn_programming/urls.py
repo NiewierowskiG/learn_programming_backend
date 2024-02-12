@@ -14,4 +14,5 @@ urlpatterns = [
     path('lessonxuser/<int:pk>/', LessonXUserView.as_view()),
     path('opinions/', OpinionListView.as_view()),
     path('opinion/<int:pk>/', OpinionView.as_view()),
+    path('whoami/', WhoAmI.as_view()),
 ]

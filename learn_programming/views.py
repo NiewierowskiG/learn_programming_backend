@@ -193,3 +193,9 @@ class OpinionView(APIView):
         opinion = get_object_or_404(Opinion, pk=pk)
         opinion.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class WhoAmI(APIView):
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)

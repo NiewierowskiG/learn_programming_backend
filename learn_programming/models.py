@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db.models import Avg
 
 
 class User(AbstractUser):
@@ -17,6 +18,15 @@ class Course(models.Model):
     language = models.ForeignKey(Language, null=True, on_delete=models.SET_NULL)
     description = models.TextField()
     short_desc = models.CharField(max_length=255, null=False)
+    url = models.CharField(max_length=255, null=True)
+
+    @property
+    def avg_rating(self):
+        return Opinion.objects.filter(course_id=self.id).aggregate(Avg('rating'))['rating__avg']
+
+    @property
+    def count_rating(self):
+        return len(Opinion.objects.filter(course_id=self.id))
 
 
 class Lesson(models.Model):
