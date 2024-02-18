@@ -6,6 +6,7 @@ from .serializers import *
 from .models import *
 from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.tokens import AccessToken
+from django.contrib.auth.hashers import make_password
 
 
 class UserListView(APIView):
@@ -19,7 +20,10 @@ class UserListView(APIView):
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            serializer.save()
+            user = User.objects.create_user(
+                **serializer.data
+            )
+            print(user)
             return Response(serializer.data)
 
 
