@@ -7,6 +7,8 @@ from .models import *
 from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.tokens import AccessToken
 from django.contrib.auth.hashers import make_password
+import requests
+import json
 
 
 class UserListView(APIView):
@@ -233,3 +235,14 @@ class WhoAmI(APIView):
         user = User.objects.get(pk=token['user_id'])
         serializer = UserSerializer(user)
         return Response(serializer.data)
+
+
+class CompileView(APIView):
+    permission_required = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = CompileSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        response = requests.post("http://127.0.0.1:8001/language_test", json=serializer.data)
+        print(response)
+        return Response(data=response.json(), status=response.status_code)

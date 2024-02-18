@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
 from .models import *
-from secrets import compare_digest
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -67,3 +66,12 @@ class CourseSerializerSingle(serializers.ModelSerializer):
         fields = (
             'id', 'title', 'owner', 'language', 'description', 'short_desc', 'url', 'avg_rating', 'count_rating',
             'ratings', 'lessons')
+
+
+class CompileSerializer(serializers.Serializer):
+    compile_code = serializers.CharField(max_length=10000)
+    expected_result = serializers.CharField(max_length=1000)
+    language = serializers.CharField(max_length=100)
+
+    class Meta:
+        fields = "__all__"
