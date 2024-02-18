@@ -4,7 +4,7 @@ from django.db.models import Avg
 
 
 class User(AbstractUser):
-    bio = models.CharField(max_length=255, blank=True)
+    bio = models.CharField(max_length=255, blank=True, null=True)
     email = models.EmailField()
 
 
@@ -17,7 +17,7 @@ class Course(models.Model):
     owner = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     language = models.ForeignKey(Language, null=True, on_delete=models.SET_NULL)
     description = models.TextField()
-    short_desc = models.CharField(max_length=255, null=False)
+    short_desc = models.CharField(max_length=150, null=False)
     url = models.CharField(max_length=255, null=True)
 
     @property

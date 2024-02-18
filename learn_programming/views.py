@@ -1,13 +1,16 @@
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import *
 from .models import *
 from django.shortcuts import get_object_or_404
-from django.forms.models import model_to_dict
+from rest_framework_simplejwt.tokens import AccessToken
 
 
 class UserListView(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
 
     def get(self, request):
         serializer = UserSerializer(User.objects.all(), many=True)
@@ -21,6 +24,7 @@ class UserListView(APIView):
 
 
 class UserView(APIView):
+    permission_required = [IsAuthenticated]
 
     def get(self, request, pk):
         user = get_object_or_404(User, pk=pk)
@@ -41,6 +45,8 @@ class UserView(APIView):
 
 
 class LanguageListView(APIView):
+    permission_required = [IsAuthenticated]
+
     def get(self, request):
         serializer = LanguageSerializer(Language.objects.all(), many=True)
         return Response(serializer.data)
@@ -53,6 +59,8 @@ class LanguageListView(APIView):
 
 
 class LanguageView(APIView):
+    permission_required = [IsAuthenticated]
+
     def get(self, request, pk):
         language = get_object_or_404(Language, pk=pk)
         serializer = LanguageSerializer(instance=language)
@@ -72,6 +80,8 @@ class LanguageView(APIView):
 
 
 class CourseListView(APIView):
+    permission_required = [IsAuthenticated]
+
     def get(self, request):
         serializer = CourseSerializer(Course.objects.all(), many=True)
         return Response(serializer.data)
@@ -84,6 +94,8 @@ class CourseListView(APIView):
 
 
 class CourseView(APIView):
+    permission_required = [IsAuthenticated]
+
     def get(self, request, pk):
         course = get_object_or_404(Course, pk=pk)
         serializer = CourseSerializerSingle(instance=course)
@@ -103,6 +115,8 @@ class CourseView(APIView):
 
 
 class LessonListView(APIView):
+    permission_required = [IsAuthenticated]
+
     def get(self, request):
         serializer = LessonSerializer(Lesson.objects.all(), many=True)
         return Response(serializer.data)
@@ -115,6 +129,8 @@ class LessonListView(APIView):
 
 
 class LessonView(APIView):
+    permission_required = [IsAuthenticated]
+
     def get(self, request, pk):
         lesson = get_object_or_404(Lesson, pk=pk)
         serializer = LessonSerializer(instance=lesson)
@@ -134,6 +150,8 @@ class LessonView(APIView):
 
 
 class LessonXUserListView(APIView):
+    permission_required = [IsAuthenticated]
+
     def get(self, request):
         serializer = LessonXUserSerializer(LessonXUser.objects.all(), many=True)
         return Response(serializer.data)
@@ -146,6 +164,8 @@ class LessonXUserListView(APIView):
 
 
 class LessonXUserView(APIView):
+    permission_required = [IsAuthenticated]
+
     def get(self, request, pk):
         lesson_x_user = get_object_or_404(LessonXUser, pk=pk)
         serializer = LessonXUserSerializer(instance=lesson_x_user)
@@ -165,6 +185,8 @@ class LessonXUserView(APIView):
 
 
 class OpinionListView(APIView):
+    permission_required = [IsAuthenticated]
+
     def get(self, request):
         serializer = OpinionSerializer(Opinion.objects.all(), many=True)
         return Response(serializer.data)
@@ -177,6 +199,8 @@ class OpinionListView(APIView):
 
 
 class OpinionView(APIView):
+    permission_required = [IsAuthenticated]
+
     def get(self, request, pk):
         opinion = get_object_or_404(Opinion, pk=pk)
         serializer = OpinionSerializer(instance=opinion)
@@ -196,7 +220,12 @@ class OpinionView(APIView):
 
 
 class WhoAmI(APIView):
+    permission_required = [IsAuthenticated]
+
     def get(self, request):
-        serializer = UserSerializer(request.user)
-        serializer.is_valid(raise_exception=True)
+        if 'Authorization' not in request.headers:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        token = AccessToken(request.headers['Authorization'][7:])
+        user = User.objects.get(pk=token['user_id'])
+        serializer = UserSerializer(user)
         return Response(serializer.data)

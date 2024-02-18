@@ -16,10 +16,11 @@ class RegisterSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=True)
 
     def validate(self, attrs):
-        password = attrs.get('password')
-        password2 = attrs.pop('password2')
-        if compare_digest(password, password2):
+        password = attrs['password']
+        password2 = attrs['password2']
+        if str(password) != str(password2):
             raise serializers.ValidationError("Password and Confirm Password Does not match")
+        attrs.pop('password2')
         return attrs
 
     class Meta:
