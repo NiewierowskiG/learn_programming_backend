@@ -42,7 +42,7 @@ class Lesson(models.Model):
     content = models.TextField(null=False)
     course = models.ForeignKey(Course, null=False, on_delete=models.CASCADE)
     expected_output = models.TextField(null=False)
-    lesson_nr = models.SmallIntegerField()
+    lesson_nr = models.SmallIntegerField(null=True, blank=True)
 
     class Meta:
         unique_together = ('course', 'lesson_nr')
@@ -51,7 +51,7 @@ class Lesson(models.Model):
 class LessonXUser(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
-    finished = models.BooleanField()
+    finished = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ('user', 'lesson')

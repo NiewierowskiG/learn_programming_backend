@@ -20,4 +20,6 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     path('compile/', CompileView.as_view()),
+    path('nextlesson/<int:id>/', NextLessonView.as_view()),
+    path('finishlesson/<int:id>/', FinishLessonView.as_view())
 ]

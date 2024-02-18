@@ -40,9 +40,48 @@ class CourseSerializer(serializers.ModelSerializer):
 
 
 class LessonSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Lesson
         fields = ('id', 'title', 'content', 'course', 'expected_output', 'lesson_nr')
+
+    def generate_lesson_nr(self, course_instance):
+        latest_lesson = Lesson.objects.filter(course=course_instance).order_by('-lesson_nr').first()
+
+        if latest_lesson:
+            return latest_lesson.lesson_nr + 1
+        else:
+            return 1
+
+
+class LessonSerializerCreate(serializers.Serializer):
+    title = serializers.CharField()
+    content = serializers.CharField()
+    course = serializers.CharField()
+    expected_output = serializers.CharField()
+    lesson_nr = serializers.IntegerField(allow_null=True, required=False)
+
+    class Meta:
+        fields = ('title', 'content', 'course', 'expected_output', 'lesson_nr')
+
+    def create(self, validated_data):
+        course_instance = Course.objects.get(pk=validated_data['course'])
+        validated_data['lesson_nr'] = self.generate_lesson_nr(course_instance)
+        lesson_nr = validated_data.get('lesson_nr')
+        validated_data['course'] = course_instance
+
+        if lesson_nr is None:
+            validated_data['lesson_nr'] = self.generate_lesson_nr(course_instance)
+
+        return Lesson.objects.create(**validated_data)
+
+    def generate_lesson_nr(self, course_instance):
+        latest_lesson = Lesson.objects.filter(course=course_instance).order_by('-lesson_nr').first()
+
+        if latest_lesson:
+            return latest_lesson.lesson_nr + 1
+        else:
+            return 1
 
 
 class LessonXUserSerializer(serializers.ModelSerializer):

@@ -9,6 +9,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 from django.contrib.auth.hashers import make_password
 import requests
 import json
+from .helpers import get_user_by_token_request
 
 
 class UserListView(APIView):
@@ -128,9 +129,15 @@ class LessonListView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        serializer = LessonSerializer(data=request.data)
+        serializer = LessonSerializerCreate(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            serializer.save()
+            lesson_nr_present = 'lesson_nr' in serializer.validated_data
+            if not lesson_nr_present:
+                # If 'lesson_nr' is not present, the serializer has already generated it
+                serializer.save()
+            else:
+                # If 'lesson_nr' is present, save the serializer without generating it
+                serializer.save(lesson_nr=serializer.validated_data['lesson_nr'])
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
@@ -229,10 +236,7 @@ class WhoAmI(APIView):
     permission_required = [IsAuthenticated]
 
     def get(self, request):
-        if 'Authorization' not in request.headers:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        token = AccessToken(request.headers['Authorization'][7:])
-        user = User.objects.get(pk=token['user_id'])
+        user = get_user_by_token_request(request)
         serializer = UserSerializer(user)
         return Response(serializer.data)
 
@@ -246,3 +250,45 @@ class CompileView(APIView):
         response = requests.post("http://127.0.0.1:8001/language_test", json=serializer.data)
         print(response)
         return Response(data=response.json(), status=response.status_code)
+
+
+class StartCourseView(APIView):
+    permission_required = [IsAuthenticated]
+
+    def post(self, request, id):
+        token = AccessToken(request.headers['Authorization'][7:])
+        user = User.objects.get(pk=token['user_id'])
+        lesson = Lesson.objects.get(course_id=id, lesson_nr=1)
+        serializer = LessonXUserSerializer(data={
+            'user': user,
+            'lesson': lesson,
+            'finished': False
+        })
+        serializer.is_valid(raise_exception=True)
+        return Response({'lesson_id': lesson.id}, status=status.HTTP_201_CREATED)
+
+
+class NextLessonView(APIView):
+    permission_required = [IsAuthenticated]
+
+    def post(self, request, id):
+        current_lesson = Lesson.objects.get(pk=id)
+        next_lesson = Lesson.objects.get(
+            course_id=current_lesson.course_id,
+            lesson_nr=current_lesson.lesson_nr + 1
+        )
+        user = get_user_by_token_request(request)
+        lxu, _ = LessonXUser.objects.get_or_create(user_id=user.id, lesson_id=next_lesson.id)
+        return Response({'id': next_lesson.id}, status=status.HTTP_200_OK)
+
+
+class FinishLessonView(APIView):
+    permission_required = [IsAuthenticated]
+
+    def post(self, request, id):
+        lesson = Lesson.objects.get(pk=id)
+        user = get_user_by_token_request(request)
+        lxu = LessonXUser.objects.get(lesson_id=lesson.id, user_id=user.id)
+        lxu.finished = True
+        lxu.save()
+        return Response(status=status.HTTP_200_OK)
