@@ -313,6 +313,6 @@ class UserCoursesStartedView(APIView):
         lesson_ids = [ x.lesson_id for x in LessonXUser.objects.filter(user_id=user.id)]
         courses = [x.course_id for x in Lesson.objects.filter(pk__in=lesson_ids)]
         courses = list(set(courses))
-        return Response({'x': courses}, status=status.HTTP_200_OK)
+        return Response({'courses': courses}, status=status.HTTP_200_OK)
 
 
