@@ -297,4 +297,10 @@ class FinishLessonView(APIView):
         lxu = LessonXUser.objects.get(lesson_id=lesson.id, user_id=user.id)
         lxu.finished = True
         lxu.save()
-        return Response(status=status.HTTP_200_OK)
+        try:
+            Lesson.objects.get(course_id=lesson.course_id, lesson_nr=lesson.lesson_nr + 1)
+            is_last_lesson = False
+        except Lesson.DoesNotExist:
+            is_last_lesson = True
+        return Response({'is_last_lesson': is_last_lesson}, status=status.HTTP_200_OK)
+
