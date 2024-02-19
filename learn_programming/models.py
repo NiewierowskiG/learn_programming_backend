@@ -47,6 +47,9 @@ class Lesson(models.Model):
     class Meta:
         unique_together = ('course', 'lesson_nr')
 
+    def language(self):
+        return self.course.language.name
+
 
 class LessonXUser(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

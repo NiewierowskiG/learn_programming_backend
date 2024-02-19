@@ -6,10 +6,9 @@ from .serializers import *
 from .models import *
 from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.tokens import AccessToken
-from django.contrib.auth.hashers import make_password
 import requests
-import json
 from .helpers import get_user_by_token_request
+from django.db.models import Q
 
 
 class UserListView(APIView):
@@ -105,7 +104,13 @@ class CourseView(APIView):
 
     def get(self, request, pk):
         course = get_object_or_404(Course, pk=pk)
-        serializer = CourseSerializerSingle(instance=course)
+        user = get_user_by_token_request(request)
+        lesson_ids = Lesson.objects.filter(course_id=pk).values_list('id', flat=True)
+        lxus = LessonXUser.objects.filter(user_id=user.id, lesson_id__in=lesson_ids).order_by('-lesson_id')
+        next_lesson = None
+        if len(lxus) > 0:
+            next_lesson = lxus[0].id
+        serializer = CourseSerializerSingle(instance=course, context={'next_lesson': next_lesson})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, pk):

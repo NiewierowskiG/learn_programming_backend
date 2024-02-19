@@ -43,7 +43,7 @@ class LessonSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Lesson
-        fields = ('id', 'title', 'content', 'course', 'expected_output', 'lesson_nr')
+        fields = ('id', 'title', 'content', 'course', 'expected_output', 'lesson_nr', 'language')
 
     def generate_lesson_nr(self, course_instance):
         latest_lesson = Lesson.objects.filter(course=course_instance).order_by('-lesson_nr').first()
@@ -99,12 +99,20 @@ class OpinionSerializer(serializers.ModelSerializer):
 class CourseSerializerSingle(serializers.ModelSerializer):
     ratings = OpinionSerializer(many=True, read_only=True)
     lessons = LessonSerializer(many=True, read_only=True)
-
+    next_lesson = serializers.SerializerMethodField()
     class Meta:
         model = Course
         fields = (
             'id', 'title', 'owner', 'language', 'description', 'short_desc', 'url', 'avg_rating', 'count_rating',
-            'ratings', 'lessons')
+            'ratings', 'lessons', 'next_lesson')
+
+    def get_next_lesson(self, obj):
+        # Access values from the context
+        context = self.context
+        additional_value = context.get('next_lesson', None)
+
+        # Add your logic to calculate the next lesson using the additional value
+        return additional_value  # Replace this with your actual logic
 
 
 class CompileSerializer(serializers.Serializer):
