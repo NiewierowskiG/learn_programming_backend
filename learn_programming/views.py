@@ -270,6 +270,7 @@ class StartCourseView(APIView):
             'finished': False
         })
         serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response({'lesson_id': lesson.id}, status=status.HTTP_201_CREATED)
 
 
