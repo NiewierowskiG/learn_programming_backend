@@ -18,7 +18,7 @@ def test_compile(data: LanguageCompileData):
         'error': False
     }
     try:
-        if language == 'js':
+        if language == 'JavaScript':
             output = javascript_compile(
                 src_code=data.compile_code
             )

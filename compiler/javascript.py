@@ -8,5 +8,5 @@ def javascript_compile(src_code: str):
     with redirect_stdout(stdout):
         js2py.eval_js(src_code)
     result = stdout.getvalue()
-
-    return str(result)
+    print(len(str(result)))
+    return str(result)[1:-2]

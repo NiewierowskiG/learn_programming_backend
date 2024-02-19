@@ -10,7 +10,7 @@ class CompilerSchema(BaseModel):
 class LanguageCompileData(BaseModel):
     compile_code: str
     expected_result: str
-    language: Literal['js', 'python', 'c']
+    language: Literal['JavaScript', 'python', 'c']
 
 
 class LanguageCompileDataResponse(BaseModel):
