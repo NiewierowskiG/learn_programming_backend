@@ -23,4 +23,5 @@ urlpatterns = [
     path('nextlesson/<int:id>/', NextLessonView.as_view()),
     path('finishlesson/<int:id>/', FinishLessonView.as_view()),
     path('startcourse/<int:id>/', StartCourseView.as_view()),
+    path('usercourses/', UserCoursesStartedView.as_view()),
 ]

@@ -304,3 +304,15 @@ class FinishLessonView(APIView):
             is_last_lesson = True
         return Response({'is_last_lesson': is_last_lesson}, status=status.HTTP_200_OK)
 
+
+class UserCoursesStartedView(APIView):
+    permission_required = [IsAuthenticated]
+
+    def get(self, request):
+        user = get_user_by_token_request(request)
+        lesson_ids = [ x.lesson_id for x in LessonXUser.objects.filter(user_id=user.id)]
+        courses = [x.course_id for x in Lesson.objects.filter(pk__in=lesson_ids)]
+        courses = list(set(courses))
+        return Response({'x': courses}, status=status.HTTP_200_OK)
+
+
