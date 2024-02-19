@@ -260,8 +260,8 @@ class StartCourseView(APIView):
         user = User.objects.get(pk=token['user_id'])
         lesson = Lesson.objects.get(course_id=id, lesson_nr=1)
         serializer = LessonXUserSerializer(data={
-            'user': user,
-            'lesson': lesson,
+            'user': token['user_id'],
+            'lesson': lesson.id,
             'finished': False
         })
         serializer.is_valid(raise_exception=True)
